@@ -1,0 +1,98 @@
+[
+  {
+    "company": "ABC Corp",
+    "month": "2025-03",
+    "invoice": 6500,
+    "variable_cost": 3900,
+    "fixed_cost": 2000,
+    "revenue": 600,
+    "products": [
+      { "name": "Product A", "units_sold": 70, "price": 50, "variable_cost": 30 },
+      { "name": "Product B", "units_sold": 20, "price": 70, "variable_cost": 40 }
+    ]
+  },
+  {
+    "company": "ABC Corp",
+    "month": "2025-04",
+    "invoice": 9400,
+    "variable_cost": 5200,
+    "fixed_cost": 2500,
+    "revenue": 1700,
+    "products": [
+      { "name": "Product A", "units_sold": 90, "price": 55, "variable_cost": 32 },
+      { "name": "Product B", "units_sold": 40, "price": 80, "variable_cost": 42 }
+    ]
+  },
+  {
+    "company": "ABC Corp",
+    "month": "2025-05",
+    "invoice": 11200,
+    "variable_cost": 6600,
+    "fixed_cost": 2500,
+    "revenue": 2100,
+    "products": [
+      { "name": "Product A", "units_sold": 100, "price": 55, "variable_cost": 32 },
+      { "name": "Product B", "units_sold": 60, "price": 85, "variable_cost": 45 }
+    ]
+  },
+  {
+    "company": "Sunrise Foods",
+    "month": "2025-03",
+    "invoice": 7800,
+    "variable_cost": 4200,
+    "fixed_cost": 2200,
+    "revenue": 1400,
+    "products": [
+      { "name": "Organic Juice", "units_sold": 120, "price": 40, "variable_cost": 25 },
+      { "name": "Smoothie Pack", "units_sold": 60, "price": 50, "variable_cost": 28 }
+    ]
+  },
+  {
+    "company": "Sunrise Foods",
+    "month": "2025-04",
+    "invoice": 8900,
+    "variable_cost": 4700,
+    "fixed_cost": 2200,
+    "revenue": 2000,
+    "products": [
+      { "name": "Organic Juice", "units_sold": 130, "price": 42, "variable_cost": 25 },
+      { "name": "Smoothie Pack", "units_sold": 70, "price": 52, "variable_cost": 29 }
+    ]
+  },
+  {
+    "company": "Nova Tech",
+    "month": "2025-03",
+    "invoice": 12000,
+    "variable_cost": 8000,
+    "fixed_cost": 3000,
+    "revenue": 1000,
+    "products": [
+      { "name": "Smart Watch", "units_sold": 50, "price": 200, "variable_cost": 130 },
+      { "name": "Wireless Charger", "units_sold": 100, "price": 60, "variable_cost": 40 }
+    ]
+  },
+  {
+    "company": "Nova Tech",
+    "month": "2025-04",
+    "invoice": 15600,
+    "variable_cost": 9800,
+    "fixed_cost": 3200,
+    "revenue": 2600,
+    "products": [
+      { "name": "Smart Watch", "units_sold": 60, "price": 210, "variable_cost": 135 },
+      { "name": "Wireless Charger", "units_sold": 120, "price": 65, "variable_cost": 42 }
+    ]
+  },
+  {
+    "company": "Nova Tech",
+    "month": "2025-05",
+    "invoice": 17800,
+    "variable_cost": 11200,
+    "fixed_cost": 3200,
+    "revenue": 1400,
+    "products": [
+      { "name": "Smart Watch", "units_sold": 70, "price": 215, "variable_cost": 138 },
+      { "name": "Wireless Charger", "units_sold": 130, "price": 68, "variable_cost": 45 }
+    ]
+  }
+]

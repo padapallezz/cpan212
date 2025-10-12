@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "company": "ABC Corp",
+    "month": "2025-06",
+    "product": "Product A",
+    "predicted_units_sold": 120,
+    "predicted_price": 55,
+    "predicted_variable_cost": 32,
+    "predicted_revenue": 6600
+  },
+  {
+    "id": 2,
+    "company": "ABC Corp",
+    "month": "2025-06",
+    "product": "Product B",
+    "predicted_units_sold": 50,
+    "predicted_price": 85,
+    "predicted_variable_cost": 45,
+    "predicted_revenue": 2000
+  },
+  {
+    "id": 3,
+    "company": "ABC Corp",
+    "month": "2025-07",
+    "product": "Product A",
+    "predicted_units_sold": 130,
+    "predicted_price": 55,
+    "predicted_variable_cost": 32,
+    "predicted_revenue": 7150
+  },
+  {
+    "id": 4,
+    "company": "Sunrise Foods",
+    "month": "2025-06",
+    "product": "Organic Juice",
+    "predicted_units_sold": 150,
+    "predicted_price": 42,
+    "predicted_variable_cost": 25,
+    "predicted_revenue": 6300
+  },
+  {
+    "id": 5,
+    "company": "Nova Tech",
+    "month": "2025-06",
+    "product": "Smart Watch",
+    "predicted_units_sold": 65,
+    "predicted_price": 210,
+    "predicted_variable_cost": 135,
+    "predicted_revenue": 4875
+  }
+]

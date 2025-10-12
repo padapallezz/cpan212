@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "scenario_name": "Increase price by 10%",
+    "base_product": "Product A",
+    "old_price": 50,
+    "new_price": 55,
+    "fixed_cost": 2000,
+    "variable_cost": 30,
+    "units_sold": 100,
+    "expected_profit": 2500
+  },
+  {
+    "id": 2,
+    "scenario_name": "Reduce variable cost by 10%",
+    "base_product": "Product A",
+    "old_price": 50,
+    "new_price": 50,
+    "fixed_cost": 2000,
+    "variable_cost": 27,
+    "units_sold": 100,
+    "expected_profit": 2800
+  },
+  {
+    "id": 3,
+    "scenario_name": "Increase units sold by 20%",
+    "base_product": "Product B",
+    "old_price": 70,
+    "new_price": 70,
+    "fixed_cost": 2000,
+    "variable_cost": 40,
+    "units_sold": 72,
+    "expected_profit": 2240
+  },
+  {
+    "id": 4,
+    "scenario_name": "Decrease fixed costs by 10%",
+    "base_product": "Product B",
+    "old_price": 70,
+    "new_price": 70,
+    "fixed_cost": 1800,
+    "variable_cost": 40,
+    "units_sold": 60,
+    "expected_profit": 2280
+  },
+  {
+    "id": 5,
+    "scenario_name": "Increase price + units sold",
+    "base_product": "Product C",
+    "old_price": 85,
+    "new_price": 95,
+    "fixed_cost": 2500,
+    "variable_cost": 50,
+    "units_sold": 70,
+    "expected_profit": 2450
+  },
+  {
+    "id": 6,
+    "scenario_name": "Decrease price by 10%, increase units sold by 15%",
+    "base_product": "Product C",
+    "old_price": 85,
+    "new_price": 76.5,
+    "fixed_cost": 2500,
+    "variable_cost": 50,
+    "units_sold": 80,
+    "expected_profit": 2300
+  }
+]
