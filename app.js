@@ -13,23 +13,29 @@ app.use((req, res) => {
 })
 
 //Global error handler, log the error for debugging
-server.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
   console.log(err.stack);
   res.status(500).json({ message: "Something went wrong on the server."})
 })
 
-app
+
 
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const forecastRoutes = require('./routes/forecastRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./modules/user/user-routes');
+const revenueRoutes = require('./modules/revenue/revenue-routes');
+const whatIfRoutes = require('./modules/what_if/what-if-routes');
+
 
 app.use('/invoices', invoiceRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/forecasts', forecastRoutes);
 app.use('/auth', authRoutes);
-
+app.use('/users', userRoutes);
+app.use('/revenues', revenueRoutes);
+app.use('/whatif', whatIfRoutes);
 
 app.get('/', (req, res) => {
   res.send('Welcome to your BTracker!');
