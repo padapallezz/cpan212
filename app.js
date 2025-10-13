@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+app.use(express.json());
 
 //application-level middlewares
 //parse request body
@@ -18,13 +19,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Something went wrong on the server."})
 })
 
+const userRoutes = require('./modules/user/user-routes');
+app.use('/users', userRoutes);
+const forecastRoutes = require('./modules/forecast/forecast-routes');
+app.use('/forecasts', forecastRoutes);
 
 
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
-const forecastRoutes = require('./routes/forecastRoutes');
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./modules/user/user-routes');
 const revenueRoutes = require('./modules/revenue/revenue-routes');
 const whatIfRoutes = require('./modules/what_if/what-if-routes');
 
