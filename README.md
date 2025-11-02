@@ -8,6 +8,8 @@ What we've done: 1, 2, 3, 4 (My Tran); 5, 6, 7, 8 (Anh Truong)
     - addNew<Entity>(data) → Add a new record
     - updateExisting<Entity>(id, data) → Update a record
     - delete<Entity>(id) 
+
+
 <!-- 5. Implement Independent Routes: 
     -Created routes for each module: user-route, forecast-route, revenue-route.js, what-if-route.js
     Each uses Express.Router() and connects to its own model
@@ -23,5 +25,8 @@ What we've done: 1, 2, 3, 4 (My Tran); 5, 6, 7, 8 (Anh Truong)
 500 Internal Server Error for unexpected exceptions -->
 
 
-
-
+Phase 3
+Anh:
+- Set up MongoDB Atlas cluster and database.
+- Installed dotenv for env vars and added to .gitignore.
+- Created connectDB middleware in shared/middlewares/connect-db.js.

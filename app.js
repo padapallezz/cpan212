@@ -1,7 +1,19 @@
+//load .env file
+require('dotenv').config(); 
+
 const express = require('express');
 const app = express();
 const port = 3000;
 app.use(express.json());
+
+
+const connectDB = require('./shared/connect-db');
+connectDB(); //connect to database
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on port ${process.env.PORT || 3000}`);
+});
+
 
 //application-level middlewares
 //parse request body
