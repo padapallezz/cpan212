@@ -1,6 +1,5 @@
 [
   {
-    "id": 1,
     "company": "ABC Corp",
     "month": "2025-06",
     "product": "Product A",
@@ -10,7 +9,6 @@
     "predicted_revenue": 6600
   },
   {
-    "id": 2,
     "company": "ABC Corp",
     "month": "2025-06",
     "product": "Product B",
@@ -20,7 +18,6 @@
     "predicted_revenue": 2000
   },
   {
-    "id": 3,
     "company": "ABC Corp",
     "month": "2025-07",
     "product": "Product A",
@@ -30,7 +27,6 @@
     "predicted_revenue": 7150
   },
   {
-    "id": 4,
     "company": "Sunrise Foods",
     "month": "2025-06",
     "product": "Organic Juice",
@@ -40,7 +36,6 @@
     "predicted_revenue": 6300
   },
   {
-    "id": 5,
     "company": "Nova Tech",
     "month": "2025-06",
     "product": "Smart Watch",

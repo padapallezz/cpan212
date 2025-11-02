@@ -1,27 +1,57 @@
-const express = require("express");
-const {
-    getAllBreakEvenAnalysis,
-    getBreakEvenAnalysisByID,
-    addNewBreakEvenAnalysis,
-    updateBreakEvenAnalysis,
-    deleteBreakEvenAnalysis,
-} = require("../models/break_even_analysis-model");
+const { Router } = require('express');
 
-const {
-    validateBreakEvenAnalysis,
-    validateBreakEvenAnalysisUpdate,
-} = require("../middlewares/break_even_analysis-validator");
+//import BEP model
+const BEPModel = require('./models/break_even_analysis-model');
+const createBepRules = require('./middlewares/create_bep_rules');
+const updateBepRules = require('./middlewares/update_bep_rules');
+const bepRoute = Router();
 
-const router = express.Router();
-//get all BEP
-router.get("/", getAllBreakEvenAnalysis);
-//get BEP by id
-router.get("/:id", getBreakEvenAnalysisByID);
-//post new BEP
-router.post("/", validateBreakEvenAnalysis, addNewBreakEvenAnalysis);
-//put update BEP
-router.put("/:id", validateBreakEvenAnalysisUpdate, updateBreakEvenAnalysis);
-//delete BEP
-router.delete("/:id", deleteBreakEvenAnalysis);
+//get method
+bepRoute.get("/", async(req, res) => {
+    try {
+        const allBep = await BEPModel.find();
+        if(!allBep) res.json([]);
+        else res.json(allBep);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(`Failed to get all BEP: ${err}`)
+    }
+});
 
-module.exports = router;
+//post method
+bepRoute.post("/",createBepRules, async(req, res) => {
+    try {
+        const new_bep = await BEPModel.create({
+            company_name: req.body.company_name,
+            scenario_name: req.body.scenario_name,
+            variable_cost_per_unit: req.body.variable_cost_per_unit,
+            fixed_cost: req.body.fixed_cost,
+            selling_price_per_unit: req.body.selling_price_per_unit,
+            bep_unit: req.body.bep_unit
+        })
+        res.status(200).json(new_bep);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(`Failed to create  new bep ${err}`)
+    }
+});
+
+
+// put method to update bep
+bepRoute.put("/:id", updateBepRules, async(req, res) => {
+    try {
+        const id = req.params.id;
+        const updated_bep = await BEPModel.findByIdAndUpdate(
+            id, 
+            {$set: req.body},
+            {new: true, runValidators: true}
+        );
+        res.status(200).send(updated_bep);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(`Failed to update bep: ${err}`);
+    }
+});
+
+// delete method
+module.exports = bepRoute;

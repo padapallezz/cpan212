@@ -1,24 +1,21 @@
 [
     {
-        "id": 1,
         "user_name": "Alice",
         "password": "2002",
         "email": "alice@gmail.com"       
     },
     {
-        "id": 2,
+
         "user_name": "Bob",
         "password": "2112",
         "email": "bob@gmail.com"       
     },
     {
-        "id": 3,
         "user_name": "Alex",
         "password": "alex",
         "email": "alex@gmail.com"       
     },
     {
-        "id": 4,
         "user_name": "Tony",
         "password": "tony45",
         "email": "tony@gmail.com"       

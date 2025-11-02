@@ -1,6 +1,5 @@
 [
     {
-        "id": 1,
         "company_name": "ABC Group",
         "scenario_name": "Default scenario",
         "variable_cost_per_unit": 12,
@@ -9,7 +8,6 @@
         "bep_unit": 0.53
     },
     {
-        "id": 2,
         "company_name": "ABC Group",
         "scenario_name": "Selling price decrease 10%",
         "variable_cost_per_unit": 12,
@@ -18,7 +16,6 @@
         "bep_unit": 0.65
     },
     {
-        "id": 3,
         "company_name": "Green Group",
         "scenario_name": "Default scenario",
         "variable_cost_per_unit": 20.5,
@@ -27,7 +24,6 @@
         "bep_unit": 25
     },
     {
-        "id": 4,
         "company_name": "Blue Group",
         "scenario_name": "Default scenario",
         "variable_cost_per_unit": 14.5,

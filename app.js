@@ -1,61 +1,44 @@
-//load .env file
-require('dotenv').config(); 
+// Load .env file
+require('dotenv').config();
 
 const express = require('express');
 const app = express();
-const port = 3000;
+
+// Connect to database
+const connectDB = require('./shared/middlewares/connect-db');
+connectDB();
+
+// Application-level middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Mount routes
+
+const bepRoute = require('./modules/break_even_analysis/break_even_analysis-routes');
 
 
-const connectDB = require('./shared/connect-db');
-connectDB(); //connect to database
+app.use('/bep', bepRoute);
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server running on port ${process.env.PORT || 3000}`);
-});
-
-
-//application-level middlewares
-//parse request body
-app.use(express.json()); //parse JSON
-app.use(express.urlencoded({ extended: true }))
-
-//hanlde 404 not found routes
-app.use((req, res) => {
-  res.status(404).json({message: "Route not found"});
-})
-
-//Global error handler, log the error for debugging
-app.use((err, req, res, next) => {
-  console.log(err.stack);
-  res.status(500).json({ message: "Something went wrong on the server."})
-})
-
-const userRoutes = require('./modules/user/user-routes');
-app.use('/users', userRoutes);
-const forecastRoutes = require('./modules/forecast/forecast-routes');
-app.use('/forecasts', forecastRoutes);
-
-
-const invoiceRoutes = require('./routes/invoiceRoutes');
-const expenseRoutes = require('./routes/expenseRoutes');
-const authRoutes = require('./routes/authRoutes');
-const revenueRoutes = require('./modules/revenue/revenue-routes');
-const whatIfRoutes = require('./modules/what_if/what-if-routes');
-
-
-app.use('/invoices', invoiceRoutes);
-app.use('/expenses', expenseRoutes);
-app.use('/forecasts', forecastRoutes);
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/revenues', revenueRoutes);
-app.use('/whatif', whatIfRoutes);
-
+// Root route
 app.get('/', (req, res) => {
   res.send('Welcome to your BTracker!');
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// 404 Middleware (AFTER routes)
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Global error handler (AFTER routes)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    message: err.message || 'Something went wrong on the server.'
+  });
+});
+
+// Start server (only once)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
