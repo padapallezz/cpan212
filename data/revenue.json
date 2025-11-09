@@ -1,7 +1,6 @@
 [
   {
     "company": "ABC Corp",
-    "month": "2025-03",
     "invoice": 6500,
     "variable_cost": 3900,
     "fixed_cost": 2000,

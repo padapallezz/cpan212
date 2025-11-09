@@ -15,9 +15,14 @@ app.use(express.urlencoded({ extended: true }));
 // Mount routes
 
 const bepRoute = require('./modules/break_even_analysis/break_even_analysis-routes');
-
+const forecastRoute  = require("./modules/forecast/forecast-routes");
+const revenueRoute = require("./modules/revenue/revenue-routes")
+const whatIfRoute = require('./modules/what_if/what-if-routes');
 
 app.use('/bep', bepRoute);
+app.use('/forecast', forecastRoute);
+app.use('/revenue', revenueRoute);
+app.use('/whatif', whatIfRoute);
 
 // Root route
 app.get('/', (req, res) => {
@@ -37,7 +42,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server (only once)
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
