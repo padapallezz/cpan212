@@ -1,76 +1,102 @@
-const express = require("express");
-const {
-  getAllWhatIf,
-  getScenarioByID,
-  addNewScenario,
-  updateScenario,
-  deleteScenario,
-} = require("../models/what_if-model");
+const { Router } = require('express');
 
-const {
-  validateScenario,
-  validateScenarioUpdate,
-} = require("../middlewares/whatif-validator");
+//import WhatIFModel model
+const WhatIfModel = require('./models/what_if-model');
+const createWhatIfRules = require('./middlewares/create_whatif_rules');
+const updateWhatIfRules = require('./middlewares/update_whatif_rules');
+const whatifRoute = Router();
 
-const router = express.Router();
 
-// GET all scenarios
-router.get("/", async (req, res) => {
+whatifRoute.get("/", async (req, res) => {
   try {
-    const scenarios = await getAllWhatIf();
-    res.status(200).json(scenarios);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const query = {};
 
-// GET scenario by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const scenario = await getScenarioByID(req.params.id);
-    if (!scenario) return res.status(404).json({ error: "Scenario not found" });
-    res.status(200).json(scenario);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST new scenario
-router.post("/", validateScenario, async (req, res) => {
-  try {
-    const newScenario = await addNewScenario(req.body);
-    res.status(201).json(newScenario);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// PUT update scenario
-router.put("/:id", validateScenarioUpdate, async (req, res) => {
-  try {
-    const updated = await updateScenario(req.params.id, req.body);
-    res.status(200).json(updated);
-  } catch (err) {
-    if (err.message.includes("doesn't exist")) {
-      res.status(404).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: err.message });
+    // TEXT FILTERING
+    if (req.query.scenario_name) {
+      query.scenario_name = { $regex: `^${req.query.scenario_name}$`, $options: "i" };
     }
-  }
-});
-
-// DELETE scenario
-router.delete("/:id", async (req, res) => {
-  try {
-    const deleted = await deleteScenario(req.params.id);
-    res.status(200).json(deleted);
-  } catch (err) {
-    if (err.message.includes("doesn't exist")) {
-      res.status(404).json({ error: err.message });
-    } else {
-      res.status(500).json({ error: err.message });
+    else if (req.query.scenario_name_like) {
+      query.scenario_name = { $regex: req.query.scenario_name_like, $options: "i" };
     }
+
+    if (req.query.base_product) {
+      query.base_product = { $regex: `^${req.query.base_product}$`, $options: "i" };
+    }
+    else if (req.query.base_product_like) {
+      query.base_product = { $regex: req.query.base_product_like, $options: "i" };
+    }
+
+    // NUMERIC FILTERING
+    const numeric_fields = ['old_price', 'new_price', 'fixed_cost', 'variable_cost', 'units_sold', 'expected_profit'];
+    numeric_fields.forEach(field => {
+      const min = req.query[`${field}_min`];
+      const max = req.query[`${field}_max`];
+      if (min || max) {
+        query[field] = {};
+        if (min) query[field].$gte = Number(min);
+        if (max) query[field].$lte = Number(max);
+      }
+    });
+
+    // PAGINATION
+    const limit = parseInt(req.query.limit) || 20;
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
+
+    const whatifs = await WhatIfModel.find(query).skip(skip).limit(limit);
+    res.status(200).json(whatifs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(`Failed to get WhatIf: ${err}`);
   }
 });
 
-module.exports = router;
+// POST method
+whatifRoute.post("/", createWhatIfRules, async (req, res) => {
+  try {
+    const newWhatIf = await WhatIfModel.create({
+      scenario_name: req.body.scenario_name,
+      base_product: req.body.base_product,
+      old_price: Number(req.body.old_price),
+      new_price: Number(req.body.new_price),
+      fixed_cost: Number(req.body.fixed_cost),
+      variable_cost: Number(req.body.variable_cost),
+      units_sold: Number(req.body.units_sold),
+      expected_profit: Number(req.body.expected_profit)
+    });
+
+    res.status(200).json(newWhatIf);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(`Failed to create WhatIf: ${err}`);
+  }
+});
+
+// PUT update
+whatifRoute.put("/:id", updateWhatIfRules, async (req, res) => {
+  try {
+    const updatedWhatIf = await WhatIfModel.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+    res.status(200).json(updatedWhatIf);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(`Failed to update WhatIf: ${err}`);
+  }
+});
+
+// DELETE
+whatifRoute.delete("/:id", async (req, res) => {
+  try {
+    const deletedWhatIf = await WhatIfModel.findByIdAndDelete(req.params.id);
+    if (!deletedWhatIf) return res.status(404).send('WhatIf not found');
+    res.status(200).json(deletedWhatIf);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(`Failed to delete WhatIf: ${err}`);
+  }
+});
+
+module.exports = whatifRoute;
