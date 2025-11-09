@@ -30,3 +30,8 @@ Anh:
 - Set up MongoDB Atlas cluster and database.
 - Installed dotenv for env vars and added to .gitignore.
 - Created connectDB middleware in shared/middlewares/connect-db.js.
+
+My Tran
+- Create Mongoose Schemas inside each module's models folder
+- Replace previous JSON-based logic with actual Mongoose CRUD operations for each module.
+- Enhance your GET routes with filtering options, update post, put, delete methods.
