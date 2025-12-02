@@ -35,3 +35,17 @@ My Tran
 - Create Mongoose Schemas inside each module's models folder
 - Replace previous JSON-based logic with actual Mongoose CRUD operations for each module.
 - Enhance your GET routes with filtering options, update post, put, delete methods.
+
+
+ 
+ Phase 4 Frontend
+
+Anh;
+-- create react app
+  - BepForm.js: add/edit BEP
+  - BepList:list of BEP entries with delete
+- Created pages: Home, BepAdd, BepEdit, BepList
+
+- Testing
+- Configured React Router for BEP routes
+- Added basic form validation (required fields)
