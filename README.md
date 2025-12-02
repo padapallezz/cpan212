@@ -41,11 +41,10 @@ My Tran
  Phase 4 Frontend
 
 Anh;
--- create react app
-  - BepForm.js: add/edit BEP
-  - BepList:list of BEP entries with delete
-- Created pages: Home, BepAdd, BepEdit, BepList
-
+- Set up react app
+- create Forms for BEP, Revenue, Forecast, What-If
+-  Implement list components: BepList, RevenueList, WhatIfList, ForeCastList with delete
+- Created pages for list, add, edit
 - Testing
-- Configured React Router for BEP routes
-- Added basic form validation (required fields)
+- Configured React Router
+- Added basic form validation 

@@ -8,7 +8,6 @@ const BepForm = ({ initialData = null, onSubmit }) => {
     price: ""
   });
 
-  // Load data nếu edit
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
