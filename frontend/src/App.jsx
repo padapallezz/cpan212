@@ -1,12 +1,11 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LayoutWithSidebar from "./Layout";
 
 // Home
 import HomePage from "./pages/Home";
 
 // BEP
 import BepListPage from "./pages/BepListPage";
-import BepAddPage from "./pages/BepAddPage";
 import BepEditPage from "./pages/BepEditPage";
 
 // Forecast
@@ -23,16 +22,20 @@ import RevenueEditPage from "./pages/RevenueEditPage";
 import WhatIfListPage from "./pages/WhatIfListPage";
 import WhatIfAddPage from "./pages/WhatIfAddPage";
 import WhatIfEditPage from "./pages/WhatIfEditPage";
+import BepPage from "./pages/BepPage";
 
 function App() {
   return (
     <Router>
+      <LayoutWithSidebar>
       <Routes>
        
         <Route path="/" element={<HomePage />} />
 
-        <Route path="/bep" element={<BepListPage />} />
-        <Route path="/bep/add" element={<BepAddPage />} />
+        <Route path="/bep" element={<BepPage />} />
+        <Route path="/bep_list" element={<BepListPage />} />
+
+        
         <Route path="/bep/edit/:id" element={<BepEditPage />} />
 
       
@@ -50,8 +53,10 @@ function App() {
         <Route path="/whatif/add" element={<WhatIfAddPage />} />
         <Route path="/whatif/edit/:id" element={<WhatIfEditPage />} />
       </Routes>
+      </LayoutWithSidebar>
     </Router>
   );
 }
 
 export default App;
+
