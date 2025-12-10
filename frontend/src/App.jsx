@@ -6,22 +6,21 @@ import HomePage from "./pages/Home";
 
 // BEP
 import BepListPage from "./pages/BepListPage";
-import BepEditPage from "./pages/BepEditPage";
+import BepDetailPage from "./pages/BepDetailPage";
 
 // Forecast
 import ForecastListPage from "./pages/ForecastListPage";
 import ForecastAddPage from "./pages/ForecastAddPage";
-import ForecastEditPage from "./pages/ForecastEditPage";
+import ForecastEditPage from "./pages/RevenuePage";
 
 // Revenue
+import RevenuePage from "./pages/RevenuePage";
+import RevenueDetailsPage from "./pages/RevenueDetailPage";
 import RevenueListPage from "./pages/RevenueListPage";
-import RevenueAddPage from "./pages/RevenueAddPage";
-import RevenueEditPage from "./pages/RevenueEditPage";
 
 // What-If
-import WhatIfListPage from "./pages/WhatIfListPage";
-import WhatIfAddPage from "./pages/WhatIfAddPage";
-import WhatIfEditPage from "./pages/WhatIfEditPage";
+import WhatIfPage from "./pages/WhatIfPage";
+import WhatIfAddPage from "./pages/WhatIfPage";
 import BepPage from "./pages/BepPage";
 
 function App() {
@@ -34,9 +33,8 @@ function App() {
 
         <Route path="/bep" element={<BepPage />} />
         <Route path="/bep_list" element={<BepListPage />} />
+        <Route path="/bep/:id" element={<BepDetailPage />} />
 
-        
-        <Route path="/bep/edit/:id" element={<BepEditPage />} />
 
       
         <Route path="/forecast" element={<ForecastListPage />} />
@@ -44,14 +42,15 @@ function App() {
         <Route path="/forecast/edit/:id" element={<ForecastEditPage />} />
 
 
-        <Route path="/revenue" element={<RevenueListPage />} />
-        <Route path="/revenue/add" element={<RevenueAddPage />} />
-        <Route path="/revenue/edit/:id" element={<RevenueEditPage />} />
+        <Route path="/revenue" element={<RevenuePage />} />
+        <Route path="/revenue/:year/:month" element={<RevenueDetailsPage />} />
+        <Route path="/all_revenues" element={<RevenueListPage />} />
+
+
 
        
-        <Route path="/whatif" element={<WhatIfListPage />} />
+        <Route path="/whatif" element={<WhatIfPage />} />
         <Route path="/whatif/add" element={<WhatIfAddPage />} />
-        <Route path="/whatif/edit/:id" element={<WhatIfEditPage />} />
       </Routes>
       </LayoutWithSidebar>
     </Router>

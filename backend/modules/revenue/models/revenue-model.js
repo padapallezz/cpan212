@@ -16,7 +16,10 @@ const RevenueSchema = new mongoose.Schema({
   variable_cost: { type: Number, required: true, min: 0 },     
   fixed_cost: { type: Number, default: 0, min: 0 },            
   profit: { type: Number, required: true, min: 0 },            
-  products: { type: [ProductSchema], required: true }          
+  products: { type: [ProductSchema], required: true }, 
+  month: { type: Number, required: true, min: 1, max: 12 },
+  year: { type: Number, required: true, min: 2000 }
+       
 }, { timestamps: true });                                        
 
 // Create the model

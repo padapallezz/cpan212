@@ -1,0 +1,10 @@
+company,invoice,revenue,variable_cost,fixed_cost,profit,products
+"ACME Corp",1001,50000,20000,5000,25000,"[{""name"":""Product A"",""units_sold"":100,""price"":200,""variable_cost"":80},{""name"":""Product B"",""units_sold"":50,""price"":300,""variable_cost"":150}]"
+"ACME Corp",1002,52000,21000,5000,26000,"[{""name"":""Product A"",""units_sold"":105,""price"":200,""variable_cost"":80},{""name"":""Product B"",""units_sold"":55,""price"":300,""variable_cost"":150}]"
+"ACME Corp",1003,48000,19000,5000,24000,"[{""name"":""Product A"",""units_sold"":95,""price"":200,""variable_cost"":80},{""name"":""Product B"",""units_sold"":45,""price"":300,""variable_cost"":150}]"
+"Beta Ltd",2001,30000,12000,4000,14000,"[{""name"":""Product X"",""units_sold"":80,""price"":150,""variable_cost"":60},{""name"":""Product Y"",""units_sold"":40,""price"":200,""variable_cost"":120}]"
+"Beta Ltd",2002,32000,13000,4000,15000,"[{""name"":""Product X"",""units_sold"":85,""price"":150,""variable_cost"":60},{""name"":""Product Y"",""units_sold"":42,""price"":200,""variable_cost"":120}]"
+"Beta Ltd",2003,31000,12500,4000,14500,"[{""name"":""Product X"",""units_sold"":82,""price"":150,""variable_cost"":60},{""name"":""Product Y"",""units_sold"":41,""price"":200,""variable_cost"":120}]"
+"Gamma Inc",3001,45000,18000,6000,21000,"[{""name"":""Product M"",""units_sold"":90,""price"":180,""variable_cost"":70},{""name"":""Product N"",""units_sold"":60,""price"":200,""variable_cost"":100}]"
+"Gamma Inc",3002,47000,18500,6000,22500,"[{""name"":""Product M"",""units_sold"":92,""price"":180,""variable_cost"":70},{""name"":""Product N"",""units_sold"":62,""price"":200,""variable_cost"":100}]"
+"Gamma Inc",3003,46000,18200,6000,21800,"[{""name"":""Product M"",""units_sold"":91,""price"":180,""variable_cost"":70},{""name"":""Product N"",""units_sold"":61,""price"":200,""variable_cost"":100}]"

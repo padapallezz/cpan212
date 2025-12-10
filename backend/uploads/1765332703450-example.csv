@@ -1,0 +1,5 @@
+company,invoice,product_name,units_sold,price,variable_cost,fixed_cost
+ACME Corp,1001,Product A,100,200,80,5000
+ACME Corp,1001,Product B,50,300,150,5000
+ACME Corp,1002,Product A,105,200,80,5000
+ACME Corp,1002,Product B,55,300,150,5000

@@ -2,7 +2,16 @@ const { Router } = require('express');
 const RevenueModel = require('./models/revenue-model');
 const createRevenueRules = require('./middlewares/create_revenue_rules');
 const updateRevenueRules = require('./middlewares/update_revenue_rules');
+const parseRevenueCSV = require('../../utils/parseRevenueCSV')
+const multer = require("multer");
+const fs = require("fs");
 
+// Multer config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
+});
+const upload = multer({ storage });
 
 const revenueRoute = Router();
 
@@ -10,6 +19,10 @@ const revenueRoute = Router();
 revenueRoute.get("/", async (req, res) => {
   try {
     const query = {};
+    
+    // YEAR / MONTH FILTERING
+    if (req.query.year) query.year = Number(req.query.year);
+    if (req.query.month) query.month = Number(req.query.month);
 
     // TEXT FILTERING ON COMPANY
     if (req.query.company) {
@@ -54,65 +67,91 @@ revenueRoute.get("/", async (req, res) => {
   }
 });
 
-// POST method
-revenueRoute.post("/", createRevenueRules, async (req, res) => {
+//get route
+revenueRoute.get("/by-month/:year/:month", async (req, res) => {
+  const { year, month } = req.params;
+
   try {
-    const products = req.body.products.map(p => ({
-      name: p.name,
-      units_sold: Number(p.units_sold),
-      price: Number(p.price),
-      variable_cost: Number(p.variable_cost)
-    }));
-
-    const revenue = products.reduce((sum, p) => sum + p.units_sold * p.price, 0);
-    const totalVariableCost = products.reduce((sum, p) => sum + p.units_sold * p.variable_cost, 0);
-    const fixedCost = Number(req.body.fixed_cost) || 0;
-    const profit = revenue - totalVariableCost - fixedCost;
-
-    const newRevenue = await RevenueModel.create({
-      company: req.body.company,
-      invoice: revenue,
-      revenue,
-      variable_cost: totalVariableCost,
-      fixed_cost: fixedCost,
-      profit,
-      products
+    const records = await RevenueModel.find({
+      year: Number(year),
+      month: Number(month),
     });
 
-    res.status(200).json(newRevenue);
+    res.json(records);
   } catch (err) {
     console.error(err);
-    res.status(500).send(`Failed to create new revenue: ${err}`);
+    res.status(500).send("Error fetching month data");
   }
 });
 
-// PUT method
-revenueRoute.put("/:id", updateRevenueRules, async (req, res) => {
+// POST
+revenueRoute.post("/", upload.single("file"), async (req, res) => {
+  if (!req.file) return res.status(400).send("No file uploaded");
+
+  let month = Number(req.body.month);
+  let year = Number(req.body.year);
+
+  if (isNaN(month) || isNaN(year)) return res.status(400).send("Invalid month/year");
+
   try {
-    const id = req.params.id;
-    const updatedRevenue = await RevenueModel.findByIdAndUpdate(
-      id,
-      { $set: req.body },
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json(updatedRevenue);
+    const records = await parseRevenueCSV(req.file.path, month, year);
+    fs.unlinkSync(req.file.path);
+    res.status(200).json({ message: "CSV uploaded and saved", count: records.length });
   } catch (err) {
     console.error(err);
-    res.status(500).send(`Failed to update revenue: ${err}`);
+    res.status(500).send("Error processing CSV file");
   }
 });
+
+// PUT
+revenueRoute.put("/:year/:month", upload.single("file"), async (req, res) => {
+  const paramYear = Number(req.params.year);
+  const paramMonth = Number(req.params.month);
+
+  let month = Number(req.body.month);
+  let year = Number(req.body.year);
+
+  if (!req.file) return res.status(400).send("CSV file is required");
+  if (isNaN(month) || isNaN(year)) return res.status(400).send("Invalid month/year");
+
+  try {
+    // Delete previous records
+    await RevenueModel.deleteMany({ year: paramYear, month: paramMonth });
+
+    // Parse new CSV
+    const savedRecords = await parseRevenueCSV(req.file.path, month, year);
+
+    res.status(200).json({ message: "Revenue updated", records: savedRecords });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to update revenue");
+  }
+});
+
+
 
 // DELETE method
-revenueRoute.delete("/:id", async (req, res) => {
+// DELETE all revenues of a month/year
+revenueRoute.delete("/:year/:month", async (req, res) => {
+  const { year, month } = req.params;
+
   try {
-    const deletedRevenue = await RevenueModel.findByIdAndDelete(req.params.id);
-    if (!deletedRevenue) return res.status(500).send('Revenue record not found');
-    res.status(200).json(deletedRevenue);
+    const result = await RevenueModel.deleteMany({
+      year: Number(year),
+      month: Number(month),
+    });
+
+    if (result.deletedCount === 0)
+      return res.status(404).send("No revenue records found for this month/year");
+
+    res.status(200).json({
+      message: `Deleted ${result.deletedCount} revenue record(s) for ${month}/${year}`,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).send(`Failed to delete revenue: ${err}`);
+    res.status(500).send(`Failed to delete revenue records: ${err}`);
   }
 });
+
 
 module.exports = revenueRoute;

@@ -23,13 +23,13 @@ const LayoutWithSidebar = ({ children }) => {
             BEP Analysis
           </Link>
           <Link
-            to="/bep-list"
+            to="/whatif"
             className="px-6 py-3 hover:bg-blue-600 transition-colors"
           >
-            BEP Scenarios
+            What If
           </Link>
           <Link
-            to="/forecast"
+            to="/whatif"
             className="px-6 py-3 hover:bg-blue-600 transition-colors"
           >
             Forecast

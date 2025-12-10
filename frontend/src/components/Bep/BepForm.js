@@ -2,8 +2,7 @@ import React, { useState } from "react";
 
 const BepForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
-    company_name: "",
-    scenario_name: "",
+    product_name: "",
     fixed_cost: "",
     variable_cost_per_unit: "",
     selling_price_per_unit: "",
@@ -18,14 +17,23 @@ const BepForm = ({ onSubmit }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.company_name || formData.company_name.length < 3)
-      newErrors.company_name = "Company name must be at least 3 characters";
-    if (!formData.scenario_name || formData.scenario_name.length < 10)
-      newErrors.scenario_name = "Scenario name must be at least 10 characters";
+    if (!formData.product_name || formData.product_name.length < 3)
+      newErrors.product_name = "Product name must be at least 3 characters";
+    
     ["fixed_cost", "variable_cost_per_unit", "selling_price_per_unit"].forEach((field) => {
       if (formData[field] === "" || Number(formData[field]) < 0)
         newErrors[field] = `${field.replace(/_/g, " ")} must be a positive number`;
     });
+
+    const variable = Number(formData.variable_cost_per_unit);
+    const selling = Number(formData.selling_price_per_unit);
+
+    if (!newErrors.variable_cost_per_unit && !newErrors.selling_price_per_unit) {
+      if (selling <= variable) {
+        newErrors.selling_price_per_unit = "Selling price per unit must be greater than variable cost per unit";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -36,8 +44,7 @@ const BepForm = ({ onSubmit }) => {
 
     // calculate BEP units
     const bep_unit = Math.ceil(
-      Number(formData.fixed_cost) /
-        (Number(formData.selling_price_per_unit) - Number(formData.variable_cost_per_unit))
+      Number(formData.fixed_cost) / (Number(formData.selling_price_per_unit) - Number(formData.variable_cost_per_unit))
     );
 
     onSubmit({ ...formData, bep_unit });
@@ -46,22 +53,13 @@ const BepForm = ({ onSubmit }) => {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <input
-        name="company_name"
-        placeholder="Company Name"
-        value={formData.company_name}
+        name="product_name"
+        placeholder="Product Name"
+        value={formData.product_name}
         onChange={handleChange}
         className={`border p-2 rounded ${errors.company_name ? "border-red-500" : ""}`}
       />
-      {errors.company_name && <p className="text-red-600 text-sm">{errors.company_name}</p>}
-
-      <input
-        name="scenario_name"
-        placeholder="Scenario Name"
-        value={formData.scenario_name}
-        onChange={handleChange}
-        className={`border p-2 rounded ${errors.scenario_name ? "border-red-500" : ""}`}
-      />
-      {errors.scenario_name && <p className="text-red-600 text-sm">{errors.scenario_name}</p>}
+      {errors.product_name && <p className="text-red-600 text-sm">{errors.product_name}</p>}
 
       <input
         name="fixed_cost"
@@ -101,7 +99,7 @@ const BepForm = ({ onSubmit }) => {
         type="submit"
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        Create BEP Scenario
+        Save BEP Scenario
       </button>
     </form>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const numericFields = [
   { key: "fixed_cost", label: "Fixed Cost" },
@@ -14,6 +15,7 @@ const BepListPage = () => {
   const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const navigate = useNavigate();
 
   const fetchBeps = async () => {
     try {
@@ -63,17 +65,10 @@ const BepListPage = () => {
   {/* Text Filters */}
   <div className="flex flex-wrap gap-4">
     <input
-      name="company_name_like"
-      value={filters.company_name_like || ""}
+      name="product_name"
+      value={filters.product_name || ""}
       onChange={handleChange}
-      placeholder="Company Name"
-      className="border p-2 rounded flex-1 min-w-[150px]"
-    />
-    <input
-      name="scenario_name_like"
-      value={filters.scenario_name_like || ""}
-      onChange={handleChange}
-      placeholder="Scenario Name"
+      placeholder="Product Name"
       className="border p-2 rounded flex-1 min-w-[150px]"
     />
   </div>
@@ -138,8 +133,7 @@ const BepListPage = () => {
           <table className="min-w-full">
             <thead className="bg-blue-100">
               <tr>
-                <th className="py-2 px-4">Company</th>
-                <th className="py-2 px-4">Scenario</th>
+                <th className="py-2 px-4">Product Name</th>
                 <th className="py-2 px-4">Fixed Cost</th>
                 <th className="py-2 px-4">Variable Cost/Unit</th>
                 <th className="py-2 px-4">Price/Unit</th>
@@ -149,9 +143,12 @@ const BepListPage = () => {
             </thead>
             <tbody>
               {beps.map((bep) => (
-                <tr key={bep._id} className="border-t hover:bg-gray-50">
-                  <td className="py-2 px-4">{bep.company_name}</td>
-                  <td className="py-2 px-4">{bep.scenario_name}</td>
+                <tr
+                  key={bep._id}
+                  className="border-t hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/bep/${bep._id}`)}
+                >
+                  <td className="py-2 px-4">{bep.product_name}</td>
                   <td className="py-2 px-4">{bep.fixed_cost}</td>
                   <td className="py-2 px-4">{bep.variable_cost_per_unit}</td>
                   <td className="py-2 px-4">{bep.selling_price_per_unit}</td>

@@ -10,21 +10,13 @@ const bepRoute = Router();
 bepRoute.get("/", async(req, res) => {
     try {
         const query = {};
-        //Text filtering on company_name 
+        //Text filtering on product_name 
         // exact match, case-insensitive
-        if(req.query.company_name) {
-            query.company_name = { $regex: `^${req.query.company_name}$`, $options: "i"};
+        if(req.query.product_name) {
+            query.product_name = { $regex: `^${req.query.product_name}$`, $options: "i"};
         // parital match, case-insensitive
-        } else if(req.query.company_name_like) {
-            query.company_name = { $regex: req.query.company_name_like, $options: "i"};
-        }
-        // Text filtering on scenario_name
-        // exact match, case-insensitive
-        if(req.query.scenario_name) {
-            query.scenario_name = {$regex: `^${req.query.scenario_name}$`, $options: "i"};
-        // partial match
-        } else if (req.query.scenario_name_like) {
-            query.scenario_name = { $regex: req.query.scenario_name_like, $options: "i"}
+        } else if(req.query.product_name_like) {
+            query.product_name = { $regex: req.query.product_name_like, $options: "i"};
         }
 
         // NUMERIC FILTERING
@@ -65,16 +57,38 @@ bepRoute.get("/", async(req, res) => {
     }
 });
 
+// View a specific BEP by ID
+bepRoute.get('/:id', async (req, res) => {
+  const { id } = req.params; 
+
+  try {
+    const bep = await BEPModel.findById(id);
+    if (!bep) {
+      return res.status(404).json({ message: "BEP scenario not found" });
+    }
+    res.status(200).json(bep);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch BEP scenario", error: err.message });
+  }
+});
+
 //post method
 bepRoute.post("/",createBepRules, async(req, res) => {
     try {
+        const {product_name, variable_cost_per_unit, fixed_cost, selling_price_per_unit} = req.body;
+        const bep_unit = fixed_cost / (selling_price_per_unit - variable_cost_per_unit);
+
+        if (selling_price_per_unit <= variable_cost_per_unit) {
+            return res.status(400).json({ message: "Selling price per unit must be greater than variable cost per unit." });
+        }
+
         const new_bep = await BEPModel.create({
-            company_name: req.body.company_name,
-            scenario_name: req.body.scenario_name,
-            variable_cost_per_unit: req.body.variable_cost_per_unit,
-            fixed_cost: req.body.fixed_cost,
-            selling_price_per_unit: req.body.selling_price_per_unit,
-            bep_unit: req.body.bep_unit
+            product_name,
+            variable_cost_per_unit,
+            fixed_cost,
+            selling_price_per_unit,
+            bep_unit
         })
         res.status(200).json(new_bep);
     } catch (err) {
