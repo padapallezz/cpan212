@@ -48,3 +48,8 @@ Anh;
 - Testing
 - Configured React Router
 - Added basic form validation 
+My Tran
+- building UI for all modules
+- API integrate
+- form validation (frontend)
+- testing
