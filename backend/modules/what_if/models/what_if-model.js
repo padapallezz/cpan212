@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const WhatIfSchema = new mongoose.Schema({
@@ -9,8 +8,12 @@ const WhatIfSchema = new mongoose.Schema({
   fixed_cost: { type: Number, required: true, min: 0 },
   variable_cost: { type: Number, required: true, min: 0 },
   units_sold: { type: Number, required: true, min: 0 },
-  expected_profit: { type: Number, required: true }
+  expected_profit: { type: Number, required: true },
+
+  // Link to the user who created this scenario
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 
 const WhatIfModel = mongoose.model("WhatIf", WhatIfSchema);
 module.exports = WhatIfModel;
+

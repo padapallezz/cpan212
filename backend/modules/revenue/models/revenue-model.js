@@ -1,28 +1,32 @@
-const { mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 
 // Subdocument for each product
 const ProductSchema = new mongoose.Schema({
   name: { type: String, required: true, minLength: 1 },
   units_sold: { type: Number, required: true, min: 0 },
   price: { type: Number, required: true, min: 0 },
-  variable_cost: { type: Number, required: true, min: 0 } // needed to calculate profit
+  variable_cost: { type: Number, required: true, min: 0 }
 });
 
 // Main schema for company revenue
 const RevenueSchema = new mongoose.Schema({
   company: { type: String, required: true, minLength: 3 },
-  invoice: { type: Number, required: true, min: 0 },           
-  revenue: { type: Number, required: true, min: 0 },           
-  variable_cost: { type: Number, required: true, min: 0 },     
-  fixed_cost: { type: Number, default: 0, min: 0 },            
-  profit: { type: Number, required: true, min: 0 },            
-  products: { type: [ProductSchema], required: true }, 
+  invoice: { type: Number, required: true, min: 0 },
+
+  revenue: { type: Number, required: true, min: 0 },
+  variable_cost: { type: Number, required: true, min: 0 },
+  fixed_cost: { type: Number, default: 0, min: 0 },
+
+  profit: { type: Number, required: true }, // 
+
+  products: { type: [ProductSchema], required: true },
+
   month: { type: Number, required: true, min: 1, max: 12 },
-  year: { type: Number, required: true, min: 2000 }
-       
-}, { timestamps: true });                                        
+  year: { type: Number, required: true, min: 2000 },
 
-// Create the model
-const RevenueModel = mongoose.model("Revenue", RevenueSchema);
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 
-module.exports = RevenueModel;
+}, { timestamps: true });
+
+module.exports = mongoose.model("Revenue", RevenueSchema);
+

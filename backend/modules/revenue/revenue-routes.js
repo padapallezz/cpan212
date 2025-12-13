@@ -3,6 +3,7 @@ const RevenueModel = require('./models/revenue-model');
 const createRevenueRules = require('./middlewares/create_revenue_rules');
 const updateRevenueRules = require('./middlewares/update_revenue_rules');
 const parseRevenueCSV = require('../../utils/parseRevenueCSV')
+const authorize = require('../../shared/middlewares/authorize'); // our RBAC middleware
 const multer = require("multer");
 const fs = require("fs");
 
@@ -15,143 +16,243 @@ const upload = multer({ storage });
 
 const revenueRoute = Router();
 
+
 // GET method
-revenueRoute.get("/", async (req, res) => {
-  try {
-    const query = {};
-    
-    // YEAR / MONTH FILTERING
-    if (req.query.year) query.year = Number(req.query.year);
-    if (req.query.month) query.month = Number(req.query.month);
+// Admin: view all revenues
+// User: only view their own revenues
+revenueRoute.get(
+  "/",
+  authorize(["admin", "customer"]),
+  async (req, res) => {
+    try {
+      const query = {};
 
-    // TEXT FILTERING ON COMPANY
-    if (req.query.company) {
-      query.company = { $regex: `^${req.query.company}$`, $options: "i" }; // exact
-    } else if (req.query.company_like) {
-      query.company = { $regex: req.query.company_like, $options: "i" }; // partial
-    }
-
-    // NUMERIC FILTERING
-    const numericFields = ["invoice", "revenue", "variable_cost", "fixed_cost", "profit"];
-    numericFields.forEach(field => {
-      const min = req.query[`${field}_min`];
-      const max = req.query[`${field}_max`];
-      if (min || max) {
-        query[field] = {};
-        if (min) query[field].$gte = Number(min);
-        if (max) query[field].$lte = Number(max);
+      // ================= ROLE / OWNERSHIP =================
+      // If not admin → restrict to user's own data
+      if (!req.account.roles.includes("admin")) {
+        query.createdBy = req.account._id;
       }
-    });
 
-    // DATE FILTERING
-    if (req.query.createdBefore || req.query.createdAfter) {
-      query.createdAt = {};
-      if (req.query.createdBefore) query.createdAt.$lte = new Date(req.query.createdBefore);
-      if (req.query.createdAfter) query.createdAt.$gte = new Date(req.query.createdAfter);
+      // ================= YEAR / MONTH FILTERING =================
+      if (req.query.year) query.year = Number(req.query.year);
+      if (req.query.month) query.month = Number(req.query.month);
+
+      // ================= TEXT FILTERING (company) =================
+      if (req.query.company) {
+        query.company = { $regex: `^${req.query.company}$`, $options: "i" }; // exact match
+      } else if (req.query.company_like) {
+        query.company = { $regex: req.query.company_like, $options: "i" }; // partial match
+      }
+
+      // ================= NUMERIC FILTERING =================
+      const numericFields = ["invoice", "revenue", "variable_cost", "fixed_cost", "profit"];
+      numericFields.forEach(field => {
+        const min = req.query[`${field}_min`];
+        const max = req.query[`${field}_max`];
+
+        if (min || max) {
+          query[field] = {};
+          if (min) query[field].$gte = Number(min);
+          if (max) query[field].$lte = Number(max);
+        }
+      });
+
+      // ================= DATE FILTERING =================
+      if (req.query.createdBefore || req.query.createdAfter) {
+        query.createdAt = {};
+        if (req.query.createdBefore)
+          query.createdAt.$lte = new Date(req.query.createdBefore);
+        if (req.query.createdAfter)
+          query.createdAt.$gte = new Date(req.query.createdAfter);
+      }
+
+      // ================= PAGINATION =================
+      const limit = parseInt(req.query.limit) || 20;
+      const page = parseInt(req.query.page) || 1;
+      const skip = (page - 1) * limit;
+
+      const revenues = await RevenueModel.find(query)
+        .skip(skip)
+        .limit(limit);
+
+      res.status(200).json(revenues);
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).send(`Failed to get revenues: ${err}`);
+    }
+  }
+);
+
+// ==================== GET REVENUE BY ID ====================
+// Admin: can access any revenue
+// Customer: can only access their own revenue
+revenueRoute.get(
+  "/:id",
+  authorize(["admin", "customer"]),
+  async (req, res) => {
+    try {
+      const revenue = await RevenueModel.findById(req.params.id);
+      console.log(req.params.id)
+
+      if (!revenue) {
+        return res.status(404).json({ message: "Revenue not found" });
+      }
+
+      // Ownership check for customer
+      if (
+        !req.account.roles.includes("admin") &&
+        revenue.createdBy.toString() !== req.account._id
+      ) {
+        return res.status(403).json({
+          message: "Forbidden: cannot access other user's revenue",
+        });
+      }
+
+      res.status(200).json(revenue);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to fetch revenue" });
+    }
+  }
+);
+
+
+// POST - Upload revenue CSV
+// Admin & Customer can upload revenue data
+revenueRoute.post(
+  "/",
+  authorize(["admin", "customer"]),
+  upload.single("file"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).send("No file uploaded");
     }
 
-    // PAGINATION
-    const limit = parseInt(req.query.limit) || 20;
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * limit;
+    const month = Number(req.body.month);
+    const year = Number(req.body.year);
 
-    const revenues = await RevenueModel.find(query)
-      .skip(skip)
-      .limit(limit);
+    if (isNaN(month) || isNaN(year)) {
+      return res.status(400).send("Invalid month/year");
+    }
 
-    res.status(200).json(revenues);
+    try {
+      // Parse CSV and save records with creator info
+      const records = await parseRevenueCSV(
+        req.file.path,
+        month,
+        year,
+        req.account._id // ownership
+      );
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(`Failed to get revenues: ${err}`);
+      // Remove uploaded file after processing
+      fs.unlinkSync(req.file.path);
+
+      res.status(200).json({
+        message: "CSV uploaded and saved successfully",
+        count: records.length,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error processing CSV file");
+    }
   }
-});
+);
 
-//get route
-revenueRoute.get("/by-month/:year/:month", async (req, res) => {
-  const { year, month } = req.params;
 
-  try {
-    const records = await RevenueModel.find({
-      year: Number(year),
-      month: Number(month),
-    });
+// ==================== UPDATE REVENUE BY ID (CSV) ====================
+// Admin can update any revenue
+// Customer can only update THEIR OWN revenue record
+revenueRoute.put(
+  "/:id",
+  authorize(["admin", "customer"]), // must be logged in
+  upload.single("file"),
+  async (req, res) => {
+    const { id } = req.params;
 
-    res.json(records);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error fetching month data");
+    if (!req.file) {
+      return res.status(400).send("CSV file is required");
+    }
+
+    try {
+      // Find the revenue first
+      const revenue = await RevenueModel.findById(id);
+      if (!revenue) {
+        return res.status(404).json({ message: "Revenue not found" });
+      }
+
+      // Ownership check for customer
+      if (
+        !req.account.roles.includes("admin") &&
+        revenue.createdBy.toString() !== req.account._id
+      ) {
+        return res.status(403).json({ message: "Forbidden: cannot update other user's revenue" });
+      }
+
+      // Delete old revenue record
+      await RevenueModel.findByIdAndDelete(id);
+
+      // Parse CSV and save new revenue (ownership retained)
+      const savedRecords = await parseRevenueCSV(
+        req.file.path,
+        req.body.month,
+        req.body.year,
+        req.account._id
+      );
+
+      // Remove uploaded file
+      fs.unlinkSync(req.file.path);
+
+      res.status(200).json({
+        message: "Revenue updated successfully",
+        count: savedRecords.length,
+        records: savedRecords,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Failed to update revenue");
+    }
   }
-});
+);
 
-// POST
-revenueRoute.post("/", upload.single("file"), async (req, res) => {
-  if (!req.file) return res.status(400).send("No file uploaded");
+// ==================== DELETE REVENUE BY ID ====================
+// Admin can delete any revenue
+// Customer can only delete THEIR OWN revenue record
+revenueRoute.delete(
+  "/:id",
+  authorize(["admin", "customer"]), // must be logged in
+  async (req, res) => {
+    const { id } = req.params;
 
-  let month = Number(req.body.month);
-  let year = Number(req.body.year);
+    try {
+      // Find the revenue first
+      const revenue = await RevenueModel.findById(id);
+      if (!revenue) {
+        return res.status(404).json({ message: "Revenue not found" });
+      }
 
-  if (isNaN(month) || isNaN(year)) return res.status(400).send("Invalid month/year");
+      // Ownership check for customer
+      if (
+        !req.account.roles.includes("admin") &&
+        revenue.createdBy.toString() !== req.account._id
+      ) {
+        return res.status(403).json({
+          message: "Forbidden: cannot delete other user's revenue",
+        });
+      }
 
-  try {
-    const records = await parseRevenueCSV(req.file.path, month, year);
-    fs.unlinkSync(req.file.path);
-    res.status(200).json({ message: "CSV uploaded and saved", count: records.length });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error processing CSV file");
+      // Delete revenue
+      await RevenueModel.findByIdAndDelete(id);
+
+      res.status(200).json({
+        message: `Revenue record with ID ${id} deleted successfully`,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send(`Failed to delete revenue record: ${err.message}`);
+    }
   }
-});
-
-// PUT
-revenueRoute.put("/:year/:month", upload.single("file"), async (req, res) => {
-  const paramYear = Number(req.params.year);
-  const paramMonth = Number(req.params.month);
-
-  let month = Number(req.body.month);
-  let year = Number(req.body.year);
-
-  if (!req.file) return res.status(400).send("CSV file is required");
-  if (isNaN(month) || isNaN(year)) return res.status(400).send("Invalid month/year");
-
-  try {
-    // Delete previous records
-    await RevenueModel.deleteMany({ year: paramYear, month: paramMonth });
-
-    // Parse new CSV
-    const savedRecords = await parseRevenueCSV(req.file.path, month, year);
-
-    res.status(200).json({ message: "Revenue updated", records: savedRecords });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to update revenue");
-  }
-});
-
-
-
-// DELETE method
-// DELETE all revenues of a month/year
-revenueRoute.delete("/:year/:month", async (req, res) => {
-  const { year, month } = req.params;
-
-  try {
-    const result = await RevenueModel.deleteMany({
-      year: Number(year),
-      month: Number(month),
-    });
-
-    if (result.deletedCount === 0)
-      return res.status(404).send("No revenue records found for this month/year");
-
-    res.status(200).json({
-      message: `Deleted ${result.deletedCount} revenue record(s) for ${month}/${year}`,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(`Failed to delete revenue records: ${err}`);
-  }
-});
+);
 
 
 module.exports = revenueRoute;

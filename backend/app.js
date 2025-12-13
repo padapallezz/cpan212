@@ -21,14 +21,15 @@ app.use(cors({
 // Mount routes
 
 const bepRoute = require('./modules/break_even_analysis/break_even_analysis-routes');
-const forecastRoute  = require("./modules/forecast/forecast-routes");
 const revenueRoute = require("./modules/revenue/revenue-routes")
 const whatIfRoute = require('./modules/what_if/what-if-routes');
+const usersRoute = require('./modules/users/users-routes')
+
 
 app.use('/bep', bepRoute);
-app.use('/forecast', forecastRoute);
 app.use('/revenue', revenueRoute);
 app.use('/whatif', whatIfRoute);
+app.use('/users', usersRoute)
 
 // Root route
 app.get('/', (req, res) => {
