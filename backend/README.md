@@ -53,3 +53,6 @@ My Tran
 - API integrate
 - form validation (frontend)
 - testing
+
+Phase 5:
+Authentication and Authoriztion: Anh Truong(user, bep), MyTran(revenue, whatif)
